@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>日柱性格测试 - 八字探秘</title>
+<style>
+  :root {
+    --bg: #1a0a0a;
+    --card-bg: #2d1513;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --red: #b5343a;
+    --red-light: #d4535a;
+    --text: #e8d5c8;
+    --text-dim: #b8a08a;
+    --wood: #6b8e4e;
+    --fire: #d4533a;
+    --earth: #c9a040;
+    --metal: #d4c8a0;
+    --water: #4a80b4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* ===== 顶部装饰 ===== */
+  .header {
+    text-align: center;
+    padding: 28px 20px 10px;
+    position: relative;
+  }
+  .header .icon {
+    font-size: 52px;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 12px rgba(201,169,110,0.5));
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+  .header .sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    letter-spacing: 2px;
+  }
+
+  /* ===== 装饰分隔线 ===== */
+  .divider {
+    width: 60%;
+    max-width: 260px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 14px auto;
+    opacity: 0.6;
+  }
+
+  /* ===== 输入卡片 ===== */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 14px;
+    padding: 22px 20px;
+    margin: 10px 16px;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .card label {
+    display: block;
+    font-size: 14px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .card input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 1px solid rgba(201,169,110,0.35);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.3);
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+  }
+  .card input[type="date"]:focus {
+    border-color: var(--gold);
+  }
+  /* 自定义日期选择器图标颜色 */
+  .card input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(3) hue-rotate(10deg);
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 16px auto;
+    padding: 14px 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    background: linear-gradient(135deg, #8b2a2e, #b5343a);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 16px rgba(181,52,58,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(181,52,58,0.3);
+  }
+
+  /* ===== 结果区 ===== */
+  .result {
+    display: none;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .result.show {
+    display: block;
+    animation: fadeUp 0.5s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 日柱圆形展示 */
+  .pillar-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 8px 0 18px;
+  }
+  .pillar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 28px rgba(201,169,110,0.35);
+    position: relative;
+  }
+  .pillar-circle .stem {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .pillar-circle .branch {
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .pillar-divider-v {
+    font-size: 20px;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  /* 五行标签 */
+  .element-tag {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #fff;
+    margin: 0 auto 14px;
+  }
+  .element-tag.wood  { background: var(--wood); }
+  .element-tag.fire  { background: var(--fire); }
+  .element-tag.earth { background: var(--earth); color: #3a2a00; }
+  .element-tag.metal { background: #8a7a5a; }
+  .element-tag.water { background: var(--water); }
+
+  /* 性格分析文本 */
+  .personality-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,169,110,0.15);
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .personality-card::before {
+    content: "❝";
+    position: absolute;
+    top: -8px;
+    left: 14px;
+    font-size: 24px;
+    color: var(--gold);
+    opacity: 0.4;
+  }
+  .personality-card h3 {
+    font-size: 15px;
+    color: var(--gold);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .personality-card p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text);
+    text-align: justify;
+  }
+
+  /* 五行特点小卡片 */
+  .traits-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .trait-chip {
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.25);
+    color: var(--gold-light);
+  }
+
+  /* 重新测试 */
+  .btn-reset {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 6px auto 30px;
+    padding: 12px 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    background: transparent;
+    border: 1px solid rgba(201,169,110,0.4);
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-reset:active {
+    background: rgba(201,169,110,0.1);
+  }
+
+  /* ===== 底部 ===== */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(200,180,160,0.35);
+    padding: 20px 0 24px;
+    letter-spacing: 1px;
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- 头部 -->
+<div class="header">
+  <div class="icon">☯️</div>
+  <h1>日柱性格测试</h1>
+  <div class="sub">八字探秘 · 知命识己</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 输入卡片 -->
+<div class="card">
+  <label for="birthDate">📅 选择你的出生日期（公历）</label>
+  <input type="date" id="birthDate">
+</div>
+
+<button class="btn" id="btnCalc">🔮 查看我的日柱性格</button>
+
+<!-- 结果区 -->
+<div class="result" id="result">
+  <div class="pillar-badge">
+    <div class="pillar-circle" id="stemCircle">
+      <span class="stem" id="stemChar">甲</span>
+      <span class="branch" id="branchChar">子</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <span class="element-tag" id="elementTag">木</span>
+  </div>
+
+  <div class="personality-card">
+    <h3 id="personalityTitle">日柱性格解读</h3>
+    <p id="personalityText"></p>
+    <div class="traits-row" id="traitsRow"></div>
+  </div>
+
+  <button class="btn-reset" id="btnReset">🔄 重新测试</button>
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  命理之说，仅供娱乐 · 愿你活出自己想要的模样
+</div>
+
+<script>
+// ==================== 数据定义 ====================
+
+// 十天干
+const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+
+// 十二地支
+const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+
+// 五行属性
+const ELEMENTS = ["木", "木", "火", "火", "土", "土", "金", "金", "水", "水"];
+const YIN_YANG = ["阳", "阴", "阳", "阴", "阳", "阴", "阳", "阴", "阳", "阴"];
+const ELEMENT_CSS = ["wood", "wood", "fire", "fire", "earth", "earth", "metal", "metal", "water", "water"];
+
+// 性格描述库
+const PERSONALITY = {
+  "甲": {
+    title: "甲木参天 · 阳木之性",
+    desc: "甲木为十天干之首，如参天大树，挺拔向上。甲木日主的人天生具有领导气质，行事光明磊落，为人正直刚毅。你不喜欢拐弯抹角，做事果断有魄力，是天生的开拓者。胸怀大志，不甘平庸，总想在人群中脱颖而出。但有时过于直率，容易忽略他人感受，偶尔显得固执己见。你就像一棵大树，给身边人遮风挡雨，也需要学会适时弯腰。",
+    traits: ["领导力强", "正直豪爽", "志向远大", "偶尔固执", "雷厉风行"]
+  },
+  "乙": {
+    title: "乙木柔韧 · 阴木之灵",
+    desc: "乙木如藤萝花草，柔软而富有韧性。乙木日主的人温文尔雅，心思细腻，善于变通和适应环境。你有一种天然的亲和力，不争不抢却能在潜移默化中影响他人。审美眼光独到，对艺术和美有天然的感知力。柔中带刚，外表温和内心却异常坚韧。偶尔会显得有些优柔寡断，但关键时刻你总能爆发出惊人的韧性，像藤蔓一样找到出路。",
+    traits: ["温婉灵活", "心思细腻", "审美出众", "柔中带刚", "善于适应"]
+  },
+  "丙": {
+    title: "丙火灼灼 · 阳火之光",
+    desc: "丙火如烈日当空，光明磊落、热情奔放。丙火日主的人天生自带光芒，走到哪里都是焦点。你热情大方，待人真诚不设防，像太阳一样温暖着身边的人。精力旺盛、行动力超强，想到就去做，从不拖泥带水。你追求轰轰烈烈的人生，讨厌阴暗和虚伪。但热度来得快去得也快，有时缺乏耐心，需要学会收敛锋芒、持之以恒。",
+    traits: ["热情奔放", "光明磊落", "行动力强", "感染力十足", "偶尔急躁"]
+  },
+  "丁": {
+    title: "丁火如灯 · 阴火之暖",
+    desc: "丁火如烛光灯火，虽不似丙火炽烈，却温柔而持久。丁火日主的人内心细腻敏感，情感丰富却不轻易外露。你像黑夜中的一盏灯，默默照亮他人却不张扬。洞察力极强，善于捕捉细节，做事认真专注。重情重义，对在乎的人掏心掏肺。但内心戏偏多，有时会想太多导致犹豫不决。你的温暖不是太阳的炙烤，而是壁炉里让人安心的光。",
+    traits: ["温柔细腻", "洞察力强", "重情重义", "专注认真", "内心丰富"]
+  },
+  "戊": {
+    title: "戊土厚重 · 阳土之稳",
+    desc: "戊土如高山大地，厚重沉稳、包容万物。戊土日主的人是所有人中最可靠的那一个。你踏实稳重，言出必行，是朋友眼中的"定海神针"。做事脚踏实地，不投机取巧，信奉一分耕耘一分收获。为人诚信宽厚，心胸开阔，能容人所不能容。但有时过于保守，缺乏变通，让人觉得有些固执古板。你就是那座山——风雨不动，值得托付。",
+    traits: ["稳重可靠", "诚信宽厚", "脚踏实地", "包容大度", "不喜欢变动"]
+  },
+  "己": {
+    title: "己土田园 · 阴土之养",
+    desc: "己土如田园沃土，滋养万物、低调务实。己土日主的人温和谦逊，不争不抢却不可或缺。你像肥沃的土壤一样，默默滋养着身边的人和事。善于规划和经营，做事有条不紊，在细节处见真章。为人低调务实，不喜欢出风头，却总能把事情做到位。但有时过于委曲求全，需要学会为自己发声。你的力量是润物细无声的滋养。",
+    traits: ["温和谦逊", "善于规划", "细致周到", "甘于付出", "低调务实"]
+  },
+  "庚": {
+    title: "庚金刚健 · 阳金之锐",
+    desc: "庚金如刀剑利刃，刚健有力、锋芒毕露。庚金日主的人天生带有一股杀伐决断的气场。你意志坚定，做事果断干脆，面对困难从不退缩。正义感极强，见到不平事一定会站出来。目标感明确，执行力一流，是天生的实干家。但有时过于刚直，说话做事不留情面，容易伤到人。你需要明白——最好的剑不是最锋利的，而是知道何时出鞘。",
+    traits: ["意志坚定", "果断利落", "正义感强", "执行力一流", "偶尔刚直"]
+  },
+  "辛": {
+    title: "辛金珠玉 · 阴金之精",
+    desc: "辛金如珠宝美玉，精致细腻、追求完美。辛金日主的人自带贵气，对品质有极高的要求。你眼光挑剔，追求精致优雅的生活，绝不将就。心思缜密，逻辑清晰，分析问题头头是道。自尊心强，不轻易低头，骨子里有一股傲气。审美极佳，往往在艺术、设计领域有天赋。但有时过于追求完美，让自己和身边人都很累。你是需要打磨的宝石，越磨越亮。",
+    traits: ["精致优雅", "逻辑缜密", "追求完美", "自尊心强", "品味出众"]
+  },
+  "壬": {
+    title: "壬水浩荡 · 阳水之智",
+    desc: "壬水如江河大海，奔流不息、智慧通达。壬水日主的人天生聪明，思维活跃，创意源源不断。你喜欢自由，讨厌被束缚，是天生的旅行者和探索者。心胸开阔如大海，包容性强，朋友遍天下。口才好，说服力强，是天生的沟通高手。但有时随性而为，缺乏计划性，让人觉得不够靠谱。你的人生注定波澜壮阔——接受自己的流动性，那就是你最大的力量。",
+    traits: ["聪明灵动", "热爱自由", "心胸开阔", "口才出众", "善于变通"]
+  },
+  "癸": {
+    title: "癸水幽深 · 阴水之玄",
+    desc: "癸水如雨露深潭，沉静内敛、深不可测。癸水日主的人内心世界极其丰富，像深海一样藏着无数秘密。你直觉敏锐，常常能洞察别人看不透的东西。性格内敛沉静，不喜张扬，但内心波澜起伏。想象力丰富，对神秘事物有天然的亲近感。共情能力强，能真正理解他人的痛苦。但有时过于敏感多疑，容易陷入自己的情绪漩涡。你是深潭——表面平静，深处自有乾坤。",
+    traits: ["直觉敏锐", "内敛深沉", "想象力丰富", "共情力强", "神秘莫测"]
+  }
+};
+
+// ==================== 核心算法 ====================
+
+/**
+ * 计算日柱（日干 + 日支）
+ * 以 1900-01-01 = 甲子日（循环第 0 位）为基准
+ */
+function calcDayPillar(year, month, day) {
+  var baseDate = new Date(1900, 0, 1); // 1900-01-01
+  var targetDate = new Date(year, month - 1, day);
+  var diffDays = Math.floor((targetDate - baseDate) / (1000 * 60 * 60 * 24));
+
+  // 处理负余数（1900年之前的日期）
+  var stemIndex  = ((diffDays % 10) + 10) % 10;
+  var branchIndex = ((diffDays % 12) + 12) % 12;
+
+  return {
+    stem: STEMS[stemIndex],
+    branch: BRANCHES[branchIndex],
+    stemIndex: stemIndex
+  };
+}
+
+// ==================== 页面逻辑 ====================
+
+var birthInput = document.getElementById("birthDate");
+var btnCalc = document.getElementById("btnCalc");
+var resultDiv = document.getElementById("result");
+var btnReset = document.getElementById("btnReset");
+
+// 默认设为今天
+var today = new Date();
+birthInput.value = formatDate(today);
+
+function formatDate(d) {
+  var y = d.getFullYear();
+  var m = ("0" + (d.getMonth() + 1)).slice(-2);
+  var day = ("0" + d.getDate()).slice(-2);
+  return y + "-" + m + "-" + day;
+}
+
+function showResult() {
+  var dateStr = birthInput.value;
+  if (!dateStr) {
+    alert("请先选择出生日期～");
+    return;
+  }
+
+  var parts = dateStr.split("-");
+  var year  = parseInt(parts[0], 10);
+  var month = parseInt(parts[1], 10);
+  var day   = parseInt(parts[2], 10);
+
+  var pillar = calcDayPillar(year, month, day);
+  var si = pillar.stemIndex;
+  var personality = PERSONALITY[pillar.stem];
+
+  // 填充数据
+  document.getElementById("stemChar").textContent = pillar.stem;
+  document.getElementById("branchChar").textContent = pillar.branch;
+
+  var elemTag = document.getElementById("elementTag");
+  elemTag.textContent = ELEMENTS[si] + "（" + YIN_YANG[si] + "）";
+  elemTag.className = "element-tag " + ELEMENT_CSS[si];
+
+  document.getElementById("personalityTitle").textContent = personality.title;
+  document.getElementById("personalityText").textContent = personality.desc;
+
+  var traitsHtml = "";
+  for (var i = 0; i < personality.traits.length; i++) {
+    traitsHtml += '<span class="trait-chip">' + personality.traits[i] + "</span>";
+  }
+  document.getElementById("traitsRow").innerHTML = traitsHtml;
+
+  // 显示结果
+  resultDiv.classList.add("show");
+
+  // 平滑滚动到结果
+  setTimeout(function () {
+    resultDiv.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+}
+
+function resetResult() {
+  resultDiv.classList.remove("show");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  // 强制重置动画
+  resultDiv.style.display = "none";
+  setTimeout(function () {
+    resultDiv.style.display = "";
+  }, 50);
+}
+
+// 事件绑定
+btnCalc.addEventListener("click", showResult);
+btnReset.addEventListener("click", resetResult);
+
+// 页面加载时自动计算今天
+showResult();
+</script>
+
+</body>
+</html>
