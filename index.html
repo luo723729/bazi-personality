@@ -208,6 +208,37 @@
   }
   .btn-reset:active { background: rgba(90,143,108,0.06); }
 
+  /* 查看完整八字 */
+  .btn-bazi {
+    display: block; width: calc(100% - 32px); max-width: 400px; margin: 14px auto 6px;
+    padding: 12px 0; font-size: 14px; font-weight: 600; letter-spacing: 2px;
+    color: var(--gold-light); background: transparent;
+    border: 1px dashed rgba(90,143,108,0.3); border-radius: 25px;
+    cursor: pointer; font-family: inherit; transition: all 0.2s;
+  }
+  .btn-bazi:active { background: rgba(90,143,108,0.04); }
+
+  /* 八字面板 */
+  .bazi-panel { display: none; width: calc(100% - 32px); max-width: 400px; margin: 0 auto; }
+  .bazi-panel.show { display: block; animation: fadeUp 0.35s ease; }
+  .hour-select {
+    width: 100%; padding: 12px 14px; font-size: 15px; border-radius: 10px;
+    border: 1px solid rgba(90,143,108,0.2); background: #f9faf7;
+    color: var(--text); font-family: inherit; outline: none; margin-top: 6px;
+  }
+  .bazi-chart {
+    background: var(--card-bg); border: 1px solid rgba(90,143,108,0.1);
+    border-radius: 12px; padding: 16px 10px; margin-top: 10px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.03);
+  }
+  .bazi-row { display: flex; justify-content: space-around; text-align: center; }
+  .bazi-col { flex: 1; }
+  .bazi-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; display: block; margin-bottom: 4px; }
+  .bazi-label-sm { font-size: 10px; color: rgba(45,58,48,0.4); display: block; margin-bottom: 2px; }
+  .bazi-pillar { font-size: 28px; font-weight: 900; color: var(--gold-light); letter-spacing: 2px; }
+  .bazi-stem { font-size: 20px; font-weight: 700; color: #40916c; }
+  .bazi-branch { font-size: 20px; font-weight: 700; color: #5a8fad; }
+
   /* 稀有度 */
   .rarity-badge {
     display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -313,6 +344,51 @@
       <div class="sub-card cons-card">
         <div class="sub-card-head">⚠️ 核心缺点</div>
         <p class="sub-card-body" id="consText"></p>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-bazi" id="btnBazi">📋 查看完整八字 ▾</button>
+
+  <div class="bazi-panel" id="baziPanel">
+    <div class="card">
+      <label for="birthHour">⏰ 选择出生时辰</label>
+      <select id="birthHour" class="hour-select">
+        <option value="-1">暂不选择</option>
+        <option value="0">子时 23:00-00:59</option>
+        <option value="1">丑时 01:00-02:59</option>
+        <option value="2">寅时 03:00-04:59</option>
+        <option value="3">卯时 05:00-06:59</option>
+        <option value="4">辰时 07:00-08:59</option>
+        <option value="5">巳时 09:00-10:59</option>
+        <option value="6">午时 11:00-12:59</option>
+        <option value="7">未时 13:00-14:59</option>
+        <option value="8">申时 15:00-16:59</option>
+        <option value="9">酉时 17:00-18:59</option>
+        <option value="10">戌时 19:00-20:59</option>
+        <option value="11">亥时 21:00-22:59</option>
+      </select>
+    </div>
+    <div class="bazi-chart" id="baziChart">
+      <div class="bazi-row">
+        <div class="bazi-col"><span class="bazi-label">年柱</span><span class="bazi-pillar" id="yearPillar">--</span></div>
+        <div class="bazi-col"><span class="bazi-label">月柱</span><span class="bazi-pillar" id="monthPillar">--</span></div>
+        <div class="bazi-col"><span class="bazi-label">日柱</span><span class="bazi-pillar" id="dayPillar">--</span></div>
+        <div class="bazi-col"><span class="bazi-label">时柱</span><span class="bazi-pillar" id="hourPillar">--</span></div>
+      </div>
+    </div>
+    <div class="bazi-chart" id="baziStemsChart" style="margin-top:6px;">
+      <div class="bazi-row">
+        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="yearStem">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="monthStem">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="dayStem">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="hourStem">--</span></div>
+      </div>
+      <div class="bazi-row">
+        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="yearBranch">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="monthBranch">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="dayBranch">--</span></div>
+        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="hourBranch">--</span></div>
       </div>
     </div>
   </div>
@@ -700,10 +776,11 @@ var posterBackdrop = document.getElementById("posterBackdrop");
 var posterClose = document.getElementById("posterClose");
 var posterCanvas = document.getElementById("posterCanvas");
 
-// 当前日柱数据（供海报使用）
+// 当前日柱数据（供海报和八字排盘使用）
 var currentPillar = null;
 var currentPillarIndex = 0;
 var currentStemIndex = 0;
+var currentYear = 0, currentMonth = 0, currentDay = 0;
 
 // 默认设为今天
 var today = new Date();
@@ -782,10 +859,13 @@ function showResult() {
   document.getElementById("rarityText").textContent =
     "每60天轮回一次 · 六十亿人中独一无二的" + pd.name + "日柱";
 
-  // 保存当前数据供海报使用
+  // 保存当前数据供海报和八字排盘使用
   currentPillar = pd;
   currentPillarIndex = pillar.pillarIndex;
   currentStemIndex = si;
+  currentYear = year;
+  currentMonth = month;
+  currentDay = day;
 
   // 切换页面
   document.body.classList.add("show-result");
@@ -798,11 +878,110 @@ function showResult() {
 
 function resetResult() {
   document.body.classList.remove("show-result");
+  baziPanel.classList.remove("show");
+  baziOpen = false;
+  btnBazi.textContent = "📋 查看完整八字 ▾";
+  birthHour.value = "-1";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 btnCalc.addEventListener("click", showResult);
 btnReset.addEventListener("click", resetResult);
+
+// ==================== 完整八字排盘 ====================
+
+var btnBazi = document.getElementById("btnBazi");
+var baziPanel = document.getElementById("baziPanel");
+var birthHour = document.getElementById("birthHour");
+var baziOpen = false;
+
+// 面板切换
+btnBazi.addEventListener("click", function() {
+  baziOpen = !baziOpen;
+  if (baziOpen) {
+    baziPanel.classList.add("show");
+    btnBazi.textContent = "📋 收起八字 ▴";
+    updateBaziChart();
+  } else {
+    baziPanel.classList.remove("show");
+    btnBazi.textContent = "📋 查看完整八字 ▾";
+  }
+});
+
+// 选择时辰时自动更新
+birthHour.addEventListener("change", updateBaziChart);
+
+/** 年柱计算：1900=庚子年（0-index: stem=6, branch=0），按立春近似以公历年简化 */
+function calcYearPillar(year) {
+  // 1900 = 庚子 (stem 6, branch 0)
+  // 1901 = 辛丑 (stem 7, branch 1)... directly increment each year
+  var d = year - 1900;
+  var si = ((d + 6) % 10 + 10) % 10;
+  var bi = ((d + 0) % 12 + 12) % 12;
+  return { stem: STEMS[si], branch: BRANCHES[bi], stemIndex: si, branchIndex: bi };
+}
+
+/** 月柱计算：按五虎遁，月支 = (公历月 % 12)，寅月起点天干由年干决定 */
+function calcMonthPillar(yearStemIndex, month) {
+  // 月支：1月→丑(1), 2月→寅(2), ..., 12月→子(0)
+  var bi = month % 12;
+
+  // 五虎遁：寅月天干起点
+  var startStemMap = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0]; // 甲0→丙2, 乙1→戊4, 丙2→庚6, ...
+  // 甲0己5→丙2, 乙1庚6→戊4, 丙2辛7→庚6, 丁3壬8→壬8, 戊4癸9→甲0
+  var start = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];
+  var baseStem = start[yearStemIndex]; // 寅月(monthFeb=2)的天干
+
+  // monthStemIndex = (baseStem + bi - 2 + 10) % 10
+  var si = ((baseStem + bi - 2) % 10 + 10) % 10;
+  return { stem: STEMS[si], branch: BRANCHES[bi], stemIndex: si, branchIndex: bi };
+}
+
+/** 时柱计算：按五鼠遁，时支由小时决定 */
+function calcHourPillar(dayStemIndex, hourBranchIndex) {
+  // 五鼠遁：子时天干起点
+  var start = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8]; // 甲0→甲0, 乙1→丙2, 丁3→庚6, ...
+  var baseStem = start[dayStemIndex];
+
+  var si = (baseStem + hourBranchIndex) % 10;
+  return { stem: STEMS[si], branch: BRANCHES[hourBranchIndex], stemIndex: si, branchIndex: hourBranchIndex };
+}
+
+/** 更新八字排盘 */
+function updateBaziChart() {
+  var hb = parseInt(birthHour.value);
+  var year = currentYear, month = currentMonth, day = currentDay;
+  if (!year) return;
+
+  var dayPillar = calcDayPillar(year, month, day);
+  var yearPillar = calcYearPillar(year);
+  var monthPillar = calcMonthPillar(yearPillar.stemIndex, month);
+
+  // 年柱
+  document.getElementById("yearPillar").textContent = yearPillar.stem + yearPillar.branch;
+  document.getElementById("yearStem").textContent = yearPillar.stem;
+  document.getElementById("yearBranch").textContent = yearPillar.branch;
+  // 月柱
+  document.getElementById("monthPillar").textContent = monthPillar.stem + monthPillar.branch;
+  document.getElementById("monthStem").textContent = monthPillar.stem;
+  document.getElementById("monthBranch").textContent = monthPillar.branch;
+  // 日柱
+  document.getElementById("dayPillar").textContent = dayPillar.stem + dayPillar.branch;
+  document.getElementById("dayStem").textContent = dayPillar.stem;
+  document.getElementById("dayBranch").textContent = dayPillar.branch;
+
+  // 时柱
+  if (hb >= 0) {
+    var hourPillar = calcHourPillar(dayPillar.stemIndex, hb);
+    document.getElementById("hourPillar").textContent = hourPillar.stem + hourPillar.branch;
+    document.getElementById("hourStem").textContent = hourPillar.stem;
+    document.getElementById("hourBranch").textContent = hourPillar.branch;
+  } else {
+    document.getElementById("hourPillar").textContent = "??";
+    document.getElementById("hourStem").textContent = "?";
+    document.getElementById("hourBranch").textContent = "?";
+  }
+}
 
 // ==================== 分享海报 ====================
 
