@@ -60,7 +60,7 @@
     padding: 28px 20px 6px;
     position: relative;
   }
-  .header .icon { font-size: 52px; margin-bottom: 6px; filter: drop-shadow(0 0 8px rgba(90,143,108,0.3)); }
+  .header .icon { font-size: 28px; letter-spacing: 2px; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(90,143,108,0.2)); }
   .header h1 { font-size: 22px; font-weight: 700; color: var(--gold-light); letter-spacing: 3px; }
   .header .sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; letter-spacing: 2px; }
   .mbti-tag {
@@ -252,9 +252,8 @@
 <!-- ========== 输入页 ========== -->
 <div class="page page-input">
   <div class="header">
-    <div class="icon">☯️</div>
+    <div class="icon">🪵🔥⛰️⚔️💧</div>
     <h1>六十甲子日柱</h1>
-    <div class="sub">八字探秘 · 知命识己</div>
     <div class="mbti-tag">属于东方自己的MBTI人格</div>
   </div>
   <div class="divider"></div>
@@ -269,9 +268,8 @@
 <!-- ========== 结果页 ========== -->
 <div class="page page-result">
   <div class="header">
-    <div class="icon">☯️</div>
+    <div class="icon">🪵🔥⛰️⚔️💧</div>
     <h1>六十甲子日柱</h1>
-    <div class="sub">你的专属日柱解读</div>
   </div>
   <div class="divider"></div>
 
@@ -833,10 +831,10 @@ function generatePoster() {
     ctx.fill();
   }
 
-  // 顶部 ☯️ 图标
-  ctx.font = "64px sans-serif";
+  // 顶部五行图标
+  ctx.font = "36px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("☯️", w / 2, 100);
+  ctx.fillText("🪵🔥⛰️⚔️💧", w / 2, 100);
 
   // 标题
   ctx.fillStyle = "#2d6a4f";
