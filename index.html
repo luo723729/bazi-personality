@@ -167,6 +167,28 @@
   .personality-card p { font-size: 14px; line-height: 1.9; color: var(--text); text-align: justify; }
 
   .traits-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  /* 子卡片区域 */
+  .sub-cards { width: calc(100% - 32px); max-width: 400px; margin: 0 auto; }
+  .sub-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,169,110,0.12);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .sub-card-head {
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px;
+    color: var(--gold-light);
+  }
+  .sub-card-body { font-size: 13px; line-height: 1.7; color: var(--text); margin: 0; }
+  /* 不同卡片微调颜色 */
+  .career-card { border-left: 3px solid var(--gold); }
+  .marriage-card { border-left: 3px solid var(--red-light); }
+  .pros-card { border-left: 3px solid #2d9d5a; }
+  .cons-card { border-left: 3px solid #c97a3a; }
+  /* 优缺并排 */
+  .sub-card-row { display: flex; gap: 10px; }
+  .sub-card-row .sub-card { flex: 1; }
+
   .trait-chip {
     padding: 5px 12px; border-radius: 14px; font-size: 12px;
     background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); color: var(--gold-light);
@@ -267,6 +289,27 @@
     <h3 id="personalityTitle">日柱性格解读</h3>
     <p id="personalityText"></p>
     <div class="traits-row" id="traitsRow"></div>
+  </div>
+
+  <div class="sub-cards">
+    <div class="sub-card career-card">
+      <div class="sub-card-head">💼 事业方向</div>
+      <p class="sub-card-body" id="careerText"></p>
+    </div>
+    <div class="sub-card marriage-card">
+      <div class="sub-card-head">💕 感情婚姻</div>
+      <p class="sub-card-body" id="marriageText"></p>
+    </div>
+    <div class="sub-card-row">
+      <div class="sub-card pros-card">
+        <div class="sub-card-head">✅ 核心优点</div>
+        <p class="sub-card-body" id="prosText"></p>
+      </div>
+      <div class="sub-card cons-card">
+        <div class="sub-card-head">⚠️ 核心缺点</div>
+        <p class="sub-card-body" id="consText"></p>
+      </div>
+    </div>
   </div>
 
   <div class="rarity-badge" id="rarityBadge">
@@ -666,6 +709,25 @@ birthInput.value = (function(d) {
   return y + "-" + m + "-" + day;
 })(today);
 
+/** 将完整desc拆分为主文、事业、婚姻、优点、缺点 */
+function splitDesc(text) {
+  var result = { main: "", career: "", marriage: "", pros: "", cons: "" };
+  if (!text) return result;
+
+  var parts = text.split("【");
+  // parts[0] 是主文
+  result.main = parts[0].replace(/\s+$/, "");
+
+  for (var i = 1; i < parts.length; i++) {
+    var p = parts[i];
+    if (p.indexOf("事业】") === 0 || p.indexOf("事业方向】") === 0) result.career = p.replace(/^事业[^】]*】/, "").trim();
+    else if (p.indexOf("婚姻】") === 0 || p.indexOf("感情婚姻】") === 0) result.marriage = p.replace(/^婚姻[^】]*】/, "").replace(/^感情婚姻】/, "").trim();
+    else if (p.indexOf("优点】") === 0 || p.indexOf("核心优点】") === 0) result.pros = p.replace(/^优点[^】]*】/, "").replace(/^核心优点】/, "").trim();
+    else if (p.indexOf("缺点】") === 0 || p.indexOf("核心缺点】") === 0) result.cons = p.replace(/^缺点[^】]*】/, "").replace(/^核心缺点】/, "").trim();
+  }
+  return result;
+}
+
 function showResult() {
   var dateStr = birthInput.value;
   if (!dateStr) { alert("请先选择出生日期～"); return; }
@@ -694,9 +756,16 @@ function showResult() {
   elemTag.textContent = ELEMENTS[si] + "（" + YIN_YANG[si] + "）";
   elemTag.className = "element-tag " + ELEM_CSS[si];
 
-  // 性格
+  // 性格分析 —— 拆分为主文和子卡片
   document.getElementById("personalityTitle").textContent = pd.title;
-  document.getElementById("personalityText").textContent = pd.desc;
+  var fullDesc = pd.desc;
+  // 提取各部分：主文（第一个【之前）、事业、婚姻、优点、缺点
+  var sections = splitDesc(fullDesc);
+  document.getElementById("personalityText").textContent = sections.main;
+  document.getElementById("careerText").textContent = sections.career;
+  document.getElementById("marriageText").textContent = sections.marriage;
+  document.getElementById("prosText").textContent = sections.pros;
+  document.getElementById("consText").textContent = sections.cons;
 
   var traitsHtml = "";
   for (var i = 0; i < pd.traits.length; i++) {
