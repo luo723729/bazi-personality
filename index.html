@@ -7,19 +7,19 @@
 <title>六十甲子日柱性格 - 八字探秘</title>
 <style>
   :root {
-    --bg: #1a0a0a;
-    --card-bg: #2d1513;
-    --gold: #c9a96e;
-    --gold-light: #e8d5a3;
-    --red: #b5343a;
-    --red-light: #d4535a;
-    --text: #e8d5c8;
-    --text-dim: #b8a08a;
-    --wood: #6b8e4e;
-    --fire: #d4533a;
+    --bg: #f4f7f2;
+    --card-bg: #ffffff;
+    --gold: #5a8f6c;
+    --gold-light: #3d6b4f;
+    --red: #4a9c6c;
+    --red-light: #6dbd8a;
+    --text: #2d3a30;
+    --text-dim: #7d8f82;
+    --wood: #40916c;
+    --fire: #e07b5a;
     --earth: #c9a040;
-    --metal: #a09068;
-    --water: #4a80b4;
+    --metal: #8b9d83;
+    --water: #5a8fad;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -60,47 +60,53 @@
     padding: 28px 20px 6px;
     position: relative;
   }
-  .header .icon { font-size: 52px; margin-bottom: 6px; filter: drop-shadow(0 0 12px rgba(201,169,110,0.5)); }
-  .header h1 { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 3px; }
+  .header .icon { font-size: 52px; margin-bottom: 6px; filter: drop-shadow(0 0 8px rgba(90,143,108,0.3)); }
+  .header h1 { font-size: 22px; font-weight: 700; color: var(--gold-light); letter-spacing: 3px; }
   .header .sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; letter-spacing: 2px; }
+  .mbti-tag {
+    display: inline-block; margin-top: 10px; padding: 4px 14px;
+    font-size: 12px; font-weight: 600; letter-spacing: 1px;
+    color: #40916c; background: rgba(64,145,108,0.08);
+    border: 1px solid rgba(64,145,108,0.2); border-radius: 20px;
+  }
 
   .divider {
     width: 60%; max-width: 260px; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 14px auto; opacity: 0.6;
+    background: linear-gradient(90deg, transparent, rgba(90,143,108,0.5), transparent);
+    margin: 14px auto;
   }
 
   /* ===== 输入卡片 ===== */
   .card {
     background: var(--card-bg);
-    border: 1px solid rgba(201,169,110,0.2);
+    border: 1px solid rgba(90,143,108,0.15);
     border-radius: 14px;
     padding: 22px 20px;
     width: calc(100% - 32px);
     max-width: 400px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
     margin: 10px 0;
   }
   .card label { display: block; font-size: 14px; color: var(--gold-light); margin-bottom: 8px; letter-spacing: 1px; }
   .card input[type="date"] {
     width: 100%; padding: 12px 14px; font-size: 16px;
-    border: 1px solid rgba(201,169,110,0.35); border-radius: 10px;
-    background: rgba(0,0,0,0.3); color: var(--text); font-family: inherit; outline: none;
+    border: 1px solid rgba(90,143,108,0.25); border-radius: 10px;
+    background: #f9faf7; color: var(--text); font-family: inherit; outline: none;
     transition: border-color 0.3s; -webkit-appearance: none;
   }
-  .card input[type="date"]:focus { border-color: var(--gold); }
+  .card input[type="date"]:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(90,143,108,0.08); }
   .card input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.7) sepia(1) saturate(3) hue-rotate(10deg);
+    filter: invert(0.4) sepia(0.5) saturate(3) hue-rotate(70deg);
   }
 
   .btn {
     display: block; width: calc(100% - 32px); max-width: 400px; margin: 16px auto;
     padding: 14px 0; font-size: 17px; font-weight: 700; letter-spacing: 2px;
-    color: #fff; background: linear-gradient(135deg, #8b2a2e, #b5343a);
+    color: #fff; background: linear-gradient(135deg, #2d6a4f, #40916c);
     border: none; border-radius: 25px; cursor: pointer; font-family: inherit;
-    box-shadow: 0 4px 16px rgba(181,52,58,0.35); transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(45,106,79,0.25); transition: transform 0.2s, box-shadow 0.2s;
   }
-  .btn:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(181,52,58,0.3); }
+  .btn:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(45,106,79,0.2); }
 
   /* ===== 日柱展示 ===== */
   .pillar-section { text-align: center; margin: 6px 0 12px; }
@@ -115,12 +121,12 @@
   .rank-badge {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 14px; border-radius: 20px; margin: 10px 0 6px;
-    background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3);
+    background: rgba(90,143,108,0.06); border: 1px solid rgba(90,143,108,0.2);
     font-size: 12px; color: var(--gold-light); letter-spacing: 1px;
   }
   .rank-dot {
     width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
-    box-shadow: 0 0 6px var(--gold);
+    box-shadow: 0 0 6px rgba(90,143,108,0.3);
   }
 
   /* 形象标签 */
@@ -131,8 +137,8 @@
   .vibe-tag {
     display: inline-block; padding: 6px 16px; border-radius: 20px;
     font-size: 15px; font-weight: 700; letter-spacing: 1px;
-    background: rgba(201,169,110,0.12);
-    border: 1px solid rgba(201,169,110,0.3);
+    background: rgba(90,143,108,0.08);
+    border: 1px solid rgba(90,143,108,0.2);
     color: var(--gold-light);
   }
   .vibe-quote {
@@ -155,13 +161,14 @@
   /* 性格分析 */
   .personality-card {
     background: var(--card-bg);
-    border: 1px solid rgba(201,169,110,0.15);
+    border: 1px solid rgba(90,143,108,0.1);
     border-radius: 14px; padding: 20px 18px; margin-bottom: 14px; position: relative;
     width: calc(100% - 32px); max-width: 400px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   }
   .personality-card::before {
     content: "❝"; position: absolute; top: -8px; left: 14px;
-    font-size: 24px; color: var(--gold); opacity: 0.4;
+    font-size: 24px; color: var(--gold); opacity: 0.3;
   }
   .personality-card h3 { font-size: 15px; color: var(--gold); margin-bottom: 10px; letter-spacing: 1px; }
   .personality-card p { font-size: 14px; line-height: 1.9; color: var(--text); text-align: justify; }
@@ -172,43 +179,42 @@
   .sub-cards { width: calc(100% - 32px); max-width: 400px; margin: 0 auto; }
   .sub-card {
     background: var(--card-bg);
-    border: 1px solid rgba(201,169,110,0.12);
+    border: 1px solid rgba(90,143,108,0.08);
     border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.03);
   }
   .sub-card-head {
     font-size: 14px; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px;
     color: var(--gold-light);
   }
   .sub-card-body { font-size: 13px; line-height: 1.7; color: var(--text); margin: 0; }
-  /* 不同卡片微调颜色 */
-  .career-card { border-left: 3px solid var(--gold); }
-  .marriage-card { border-left: 3px solid var(--red-light); }
-  .pros-card { border-left: 3px solid #2d9d5a; }
-  .cons-card { border-left: 3px solid #c97a3a; }
-  /* 优缺并排 */
+  .career-card { border-left: 3px solid #40916c; }
+  .marriage-card { border-left: 3px solid #e07b5a; }
+  .pros-card { border-left: 3px solid #52b788; }
+  .cons-card { border-left: 3px solid #d4a373; }
   .sub-card-row { display: flex; gap: 10px; }
   .sub-card-row .sub-card { flex: 1; }
 
   .trait-chip {
     padding: 5px 12px; border-radius: 14px; font-size: 12px;
-    background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); color: var(--gold-light);
+    background: rgba(90,143,108,0.08); border: 1px solid rgba(90,143,108,0.2); color: var(--gold-light);
   }
 
   .btn-reset {
     display: block; width: calc(100% - 32px); max-width: 400px; margin: 6px auto 30px;
     padding: 12px 0; font-size: 14px; letter-spacing: 1px; color: var(--gold);
-    background: transparent; border: 1px solid rgba(201,169,110,0.4); border-radius: 25px;
+    background: transparent; border: 1px solid rgba(90,143,108,0.3); border-radius: 25px;
     cursor: pointer; font-family: inherit; transition: background 0.2s;
   }
-  .btn-reset:active { background: rgba(201,169,110,0.1); }
+  .btn-reset:active { background: rgba(90,143,108,0.06); }
 
   /* 稀有度 */
   .rarity-badge {
     display: flex; align-items: center; justify-content: center; gap: 6px;
     width: calc(100% - 32px); max-width: 400px; margin: 0 auto 12px;
     padding: 10px 0; font-size: 13px; color: var(--gold-light); letter-spacing: 1px;
-    background: rgba(201,169,110,0.06); border-radius: 10px;
-    border: 1px dashed rgba(201,169,110,0.25);
+    background: rgba(90,143,108,0.04); border-radius: 10px;
+    border: 1px dashed rgba(90,143,108,0.2);
   }
   .rarity-icon { font-size: 16px; }
 
@@ -216,27 +222,27 @@
   .btn-share {
     display: block; width: calc(100% - 32px); max-width: 400px; margin: 14px auto 10px;
     padding: 13px 0; font-size: 15px; font-weight: 600; letter-spacing: 2px;
-    color: #fff; background: linear-gradient(135deg, #1a6b3c, #2d9d5a);
+    color: #fff; background: linear-gradient(135deg, #52b788, #40916c);
     border: none; border-radius: 25px; cursor: pointer; font-family: inherit;
-    box-shadow: 0 4px 16px rgba(45,157,90,0.3); transition: transform 0.2s;
+    box-shadow: 0 4px 16px rgba(64,145,108,0.3); transition: transform 0.2s;
   }
   .btn-share:active { transform: scale(0.97); }
 
   /* 海报弹窗 */
   .poster-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
   .poster-modal.show { display: flex; align-items: center; justify-content: center; }
-  .poster-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+  .poster-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
   .poster-container { position: relative; z-index: 1; text-align: center; max-width: 90vw; max-height: 90vh; }
-  .poster-container canvas { width: 100%; max-width: 375px; height: auto; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
-  .poster-tip { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 12px; letter-spacing: 1px; }
+  .poster-container canvas { width: 100%; max-width: 375px; height: auto; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.25); }
+  .poster-tip { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 12px; letter-spacing: 1px; }
   .poster-close {
     position: absolute; top: -40px; right: 0; width: 36px; height: 36px; border-radius: 50%;
-    background: rgba(255,255,255,0.15); color: #fff; border: none; font-size: 18px;
+    background: rgba(255,255,255,0.2); color: #fff; border: none; font-size: 18px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
   }
 
   .footer {
-    text-align: center; font-size: 11px; color: rgba(200,180,160,0.35);
+    text-align: center; font-size: 11px; color: rgba(45,58,48,0.3);
     padding: 20px 0 24px; letter-spacing: 1px; margin-top: auto;
   }
 </style>
@@ -249,6 +255,7 @@
     <div class="icon">☯️</div>
     <h1>六十甲子日柱</h1>
     <div class="sub">八字探秘 · 知命识己</div>
+    <div class="mbti-tag">属于东方自己的MBTI人格</div>
   </div>
   <div class="divider"></div>
   <div class="card">
@@ -808,16 +815,16 @@ function generatePoster() {
   var w = canvas.width;
   var h = canvas.height;
 
-  // 背景渐变
+  // 背景
   var bg = ctx.createLinearGradient(0, 0, 0, h);
-  bg.addColorStop(0, "#1a0a0a");
-  bg.addColorStop(0.5, "#2d1513");
-  bg.addColorStop(1, "#1a0a0a");
+  bg.addColorStop(0, "#f4f7f2");
+  bg.addColorStop(0.4, "#ffffff");
+  bg.addColorStop(1, "#f4f7f2");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // 顶部装饰纹理（金色散点）
-  ctx.fillStyle = "rgba(201,169,110,0.06)";
+  // 顶部装饰（绿色散点）
+  ctx.fillStyle = "rgba(64,145,108,0.04)";
   for (var i = 0; i < 80; i++) {
     var dx = Math.random() * w;
     var dy = Math.random() * h * 0.5;
@@ -832,12 +839,12 @@ function generatePoster() {
   ctx.fillText("☯️", w / 2, 100);
 
   // 标题
-  ctx.fillStyle = "#c9a96e";
+  ctx.fillStyle = "#2d6a4f";
   ctx.font = "bold 36px 'PingFang SC','Microsoft YaHei',sans-serif";
   ctx.fillText("六十甲子日柱", w / 2, 168);
 
   // 分隔线
-  ctx.strokeStyle = "rgba(201,169,110,0.4)";
+  ctx.strokeStyle = "rgba(64,145,108,0.3)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(w / 2 - 100, 188);
@@ -854,14 +861,14 @@ function generatePoster() {
   // 形象标签
   var vibeY = 420;
   if (currentPillar.vibe) {
-    ctx.fillStyle = "rgba(201,169,110,0.15)";
-    ctx.strokeStyle = "rgba(201,169,110,0.35)";
+    ctx.fillStyle = "rgba(64,145,108,0.1)";
+    ctx.strokeStyle = "rgba(64,145,108,0.3)";
     ctx.lineWidth = 1;
     var vibeW = ctx.measureText(currentPillar.vibe).width + 40;
     roundRect(ctx, w/2 - vibeW/2, vibeY - 24, vibeW, 34, 17);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = "#e8d5a3";
+    ctx.fillStyle = "#2d6a4f";
     ctx.font = "bold 22px 'PingFang SC','Microsoft YaHei',sans-serif";
     ctx.fillText(currentPillar.vibe, w/2, vibeY);
     vibeY += 50;
@@ -869,19 +876,19 @@ function generatePoster() {
 
   // 一句话
   if (currentPillar.quote) {
-    ctx.fillStyle = "#b8a08a";
+    ctx.fillStyle = "#5a7d65";
     ctx.font = "italic 24px 'PingFang SC','Microsoft YaHei',sans-serif";
     ctx.fillText("「" + currentPillar.quote + "」", w/2, vibeY);
     vibeY += 48;
   }
 
   // 纳音标题
-  ctx.fillStyle = "#e8d5a3";
+  ctx.fillStyle = "#3d6b4f";
   ctx.font = "24px 'PingFang SC','Microsoft YaHei',sans-serif";
   ctx.fillText(currentPillar.title, w / 2, vibeY);
 
   // 序号 + 稀有度
-  ctx.fillStyle = "rgba(201,169,110,0.7)";
+  ctx.fillStyle = "rgba(45,106,79,0.6)";
   ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
   ctx.fillText("六十甲子 第" + (currentPillarIndex + 1) + "柱 · 每60天一次轮回", w / 2, 465);
 
@@ -899,10 +906,10 @@ function generatePoster() {
   ctx.font = "bold 20px 'PingFang SC','Microsoft YaHei',sans-serif";
   ctx.fillText("  " + elemTag + "  ", w / 2, tagY - 2);
 
-  // 性格描述（截取前120字）
+  // 性格描述
   var descText = currentPillar.desc;
   if (descText.length > 140) descText = descText.substring(0, 140) + "…";
-  ctx.fillStyle = "#e8d5c8";
+  ctx.fillStyle = "#3a4d3e";
   ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
   wrapText(ctx, descText, w / 2, 570, w - 100, 34);
 
@@ -914,31 +921,31 @@ function generatePoster() {
     var tw = ctx.measureText(traits[t]).width + 32;
     var tx = 60 + (t % 3) * 220;
     var trow = Math.floor(t / 3);
-    ctx.fillStyle = "rgba(201,169,110,0.15)";
-    ctx.strokeStyle = "rgba(201,169,110,0.3)";
+    ctx.fillStyle = "rgba(64,145,108,0.1)";
+    ctx.strokeStyle = "rgba(64,145,108,0.25)";
     ctx.lineWidth = 1;
     roundRect(ctx, tx, traitY + trow * 44 - 24, tw, 34, 17);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = "#e8d5a3";
+    ctx.fillStyle = "#2d6a4f";
     ctx.fillText(traits[t], tx + tw / 2, traitY + trow * 44 - 2);
   }
 
   // 分隔线
-  ctx.strokeStyle = "rgba(201,169,110,0.3)";
+  ctx.strokeStyle = "rgba(64,145,108,0.2)";
   ctx.beginPath();
   ctx.moveTo(w / 2 - 100, 920);
   ctx.lineTo(w / 2 + 100, 920);
   ctx.stroke();
 
   // 底部信息
-  ctx.fillStyle = "rgba(200,180,160,0.5)";
+  ctx.fillStyle = "rgba(58,77,62,0.5)";
   ctx.font = "18px 'PingFang SC','Microsoft YaHei',sans-serif";
   ctx.fillText("基于 滴天髓 · 子平真诠 · 穷通宝鉴 · 三命通会 · 渊海子平", w / 2, 970);
   ctx.fillText("扫码测测你的日柱 → bazi-personality.pages.dev", w / 2, 1000);
 
   // 底部装饰线
-  ctx.strokeStyle = "rgba(201,169,110,0.2)";
+  ctx.strokeStyle = "rgba(64,145,108,0.15)";
   ctx.beginPath();
   ctx.moveTo(60, 1030);
   ctx.lineTo(w - 60, 1030);
