@@ -162,6 +162,39 @@
   }
   .btn-reset:active { background: rgba(201,169,110,0.1); }
 
+  /* 稀有度 */
+  .rarity-badge {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: calc(100% - 32px); max-width: 400px; margin: 0 auto 12px;
+    padding: 10px 0; font-size: 13px; color: var(--gold-light); letter-spacing: 1px;
+    background: rgba(201,169,110,0.06); border-radius: 10px;
+    border: 1px dashed rgba(201,169,110,0.25);
+  }
+  .rarity-icon { font-size: 16px; }
+
+  /* 分享按钮 */
+  .btn-share {
+    display: block; width: calc(100% - 32px); max-width: 400px; margin: 14px auto 10px;
+    padding: 13px 0; font-size: 15px; font-weight: 600; letter-spacing: 2px;
+    color: #fff; background: linear-gradient(135deg, #1a6b3c, #2d9d5a);
+    border: none; border-radius: 25px; cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(45,157,90,0.3); transition: transform 0.2s;
+  }
+  .btn-share:active { transform: scale(0.97); }
+
+  /* 海报弹窗 */
+  .poster-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
+  .poster-modal.show { display: flex; align-items: center; justify-content: center; }
+  .poster-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+  .poster-container { position: relative; z-index: 1; text-align: center; max-width: 90vw; max-height: 90vh; }
+  .poster-container canvas { width: 100%; max-width: 375px; height: auto; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+  .poster-tip { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 12px; letter-spacing: 1px; }
+  .poster-close {
+    position: absolute; top: -40px; right: 0; width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); color: #fff; border: none; font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
   .footer {
     text-align: center; font-size: 11px; color: rgba(200,180,160,0.35);
     padding: 20px 0 24px; letter-spacing: 1px; margin-top: auto;
@@ -213,8 +246,23 @@
     <div class="traits-row" id="traitsRow"></div>
   </div>
 
+  <div class="rarity-badge" id="rarityBadge">
+    <span class="rarity-icon">💎</span>
+    <span id="rarityText">每60天出现一次 · 六十亿人中独一无二的你</span>
+  </div>
+  <button class="btn-share" id="btnShare">📸 生成分享海报</button>
   <button class="btn-reset" id="btnReset">🔄 重新测试</button>
   <div class="footer">命理之说，仅供娱乐 · 愿你活出自己想要的模样</div>
+</div>
+
+<!-- ========== 海报弹窗 ========== -->
+<div class="poster-modal" id="posterModal">
+  <div class="poster-backdrop" id="posterBackdrop"></div>
+  <div class="poster-container">
+    <canvas id="posterCanvas" width="750" height="1334"></canvas>
+    <div class="poster-tip">长按图片保存到相册</div>
+    <button class="poster-close" id="posterClose">✕</button>
+  </div>
 </div>
 
 <script>
@@ -575,6 +623,16 @@ function calcDayPillar(year, month, day) {
 var birthInput = document.getElementById("birthDate");
 var btnCalc = document.getElementById("btnCalc");
 var btnReset = document.getElementById("btnReset");
+var btnShare = document.getElementById("btnShare");
+var posterModal = document.getElementById("posterModal");
+var posterBackdrop = document.getElementById("posterBackdrop");
+var posterClose = document.getElementById("posterClose");
+var posterCanvas = document.getElementById("posterCanvas");
+
+// 当前日柱数据（供海报使用）
+var currentPillar = null;
+var currentPillarIndex = 0;
+var currentStemIndex = 0;
 
 // 默认设为今天
 var today = new Date();
@@ -621,8 +679,16 @@ function showResult() {
   }
   document.getElementById("traitsRow").innerHTML = traitsHtml;
 
+  // 稀有度
+  document.getElementById("rarityText").textContent =
+    "每60天轮回一次 · 六十亿人中独一无二的" + pd.name + "日柱";
+
+  // 保存当前数据供海报使用
+  currentPillar = pd;
+  currentPillarIndex = pillar.pillarIndex;
+  currentStemIndex = si;
+
   // 切换页面
-  document.body.classList.add("show-result");
 
   // 滚动到顶部
   setTimeout(function () {
@@ -637,6 +703,173 @@ function resetResult() {
 
 btnCalc.addEventListener("click", showResult);
 btnReset.addEventListener("click", resetResult);
+
+// ==================== 分享海报 ====================
+
+function generatePoster() {
+  if (!currentPillar) return;
+  var canvas = posterCanvas;
+  var ctx = canvas.getContext("2d");
+  var w = canvas.width;
+  var h = canvas.height;
+
+  // 背景渐变
+  var bg = ctx.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, "#1a0a0a");
+  bg.addColorStop(0.5, "#2d1513");
+  bg.addColorStop(1, "#1a0a0a");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  // 顶部装饰纹理（金色散点）
+  ctx.fillStyle = "rgba(201,169,110,0.06)";
+  for (var i = 0; i < 80; i++) {
+    var dx = Math.random() * w;
+    var dy = Math.random() * h * 0.5;
+    ctx.beginPath();
+    ctx.arc(dx, dy, Math.random() * 3 + 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 顶部 ☯️ 图标
+  ctx.font = "64px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("☯️", w / 2, 100);
+
+  // 标题
+  ctx.fillStyle = "#c9a96e";
+  ctx.font = "bold 36px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("六十甲子日柱", w / 2, 168);
+
+  // 分隔线
+  ctx.strokeStyle = "rgba(201,169,110,0.4)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(w / 2 - 100, 188);
+  ctx.lineTo(w / 2 + 100, 188);
+  ctx.stroke();
+
+  // 日柱大字
+  var elemColors = ["#6b8e4e","#6b8e4e","#d4533a","#d4533a","#c9a040","#c9a040","#a09068","#a09068","#4a80b4","#4a80b4"];
+  var nameColor = elemColors[currentStemIndex] || "#e8d5a3";
+  ctx.fillStyle = nameColor;
+  ctx.font = "bold 160px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText(currentPillar.name, w / 2, 370);
+
+  // 纳音标题
+  ctx.fillStyle = "#e8d5a3";
+  ctx.font = "28px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText(currentPillar.title, w / 2, 420);
+
+  // 序号 + 稀有度
+  ctx.fillStyle = "rgba(201,169,110,0.7)";
+  ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("六十甲子 第" + (currentPillarIndex + 1) + "柱 · 每60天一次轮回", w / 2, 465);
+
+  // 五行标签
+  var elemTag = ELEMENTS[currentStemIndex] + " · " + YIN_YANG[currentStemIndex];
+  ctx.fillStyle = "#fff";
+  var elemBg = elemColors[currentStemIndex] || "#c9a96e";
+  var tagW = ctx.measureText("  " + elemTag + "  ").width;
+  var tagX = w / 2 - tagW / 2;
+  var tagY = 495;
+  ctx.fillStyle = elemBg;
+  roundRect(ctx, tagX, tagY - 28, tagW, 34, 17);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 20px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("  " + elemTag + "  ", w / 2, tagY - 2);
+
+  // 性格描述（截取前120字）
+  var descText = currentPillar.desc;
+  if (descText.length > 140) descText = descText.substring(0, 140) + "…";
+  ctx.fillStyle = "#e8d5c8";
+  ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
+  wrapText(ctx, descText, w / 2, 570, w - 100, 34);
+
+  // 特质标签
+  var traits = currentPillar.traits;
+  var traitY = 730;
+  ctx.font = "20px 'PingFang SC','Microsoft YaHei',sans-serif";
+  for (var t = 0; t < traits.length; t++) {
+    var tw = ctx.measureText(traits[t]).width + 32;
+    var tx = 60 + (t % 3) * 220;
+    var trow = Math.floor(t / 3);
+    ctx.fillStyle = "rgba(201,169,110,0.15)";
+    ctx.strokeStyle = "rgba(201,169,110,0.3)";
+    ctx.lineWidth = 1;
+    roundRect(ctx, tx, traitY + trow * 44 - 24, tw, 34, 17);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#e8d5a3";
+    ctx.fillText(traits[t], tx + tw / 2, traitY + trow * 44 - 2);
+  }
+
+  // 分隔线
+  ctx.strokeStyle = "rgba(201,169,110,0.3)";
+  ctx.beginPath();
+  ctx.moveTo(w / 2 - 100, 920);
+  ctx.lineTo(w / 2 + 100, 920);
+  ctx.stroke();
+
+  // 底部信息
+  ctx.fillStyle = "rgba(200,180,160,0.5)";
+  ctx.font = "18px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("基于 滴天髓 · 子平真诠 · 穷通宝鉴 · 三命通会 · 渊海子平", w / 2, 970);
+  ctx.fillText("扫码测测你的日柱 → bazi-personality.pages.dev", w / 2, 1000);
+
+  // 底部装饰线
+  ctx.strokeStyle = "rgba(201,169,110,0.2)";
+  ctx.beginPath();
+  ctx.moveTo(60, 1030);
+  ctx.lineTo(w - 60, 1030);
+  ctx.stroke();
+  ctx.fillText("命理之说 · 仅供娱乐", w / 2, 1060);
+
+  // 显示弹窗
+  posterModal.classList.add("show");
+}
+
+// 辅助函数：圆角矩形
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// 辅助函数：自动换行
+function wrapText(ctx, text, cx, y, maxW, lineH) {
+  ctx.textAlign = "center";
+  var chars = text.split("");
+  var line = "";
+  var curY = y;
+  for (var i = 0; i < chars.length; i++) {
+    var testLine = line + chars[i];
+    if (ctx.measureText(testLine).width > maxW && line.length > 0) {
+      ctx.fillText(line, cx, curY);
+      line = chars[i];
+      curY += lineH;
+    } else { line = testLine; }
+  }
+  if (line.length > 0) ctx.fillText(line, cx, curY);
+}
+
+// 海报弹窗事件
+btnShare.addEventListener("click", generatePoster);
+
+function closePoster() {
+  posterModal.classList.remove("show");
+}
+posterClose.addEventListener("click", closePoster);
+posterBackdrop.addEventListener("click", closePoster);
 
 // 页面加载时默认填充今天日期，但不自动展示结果
 // 用户点击按钮后才弹出结果页
