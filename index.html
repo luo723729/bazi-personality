@@ -1032,6 +1032,42 @@ function updateBaziChart() {
 
 // ==================== 分享海报 ====================
 
+function drawFiveElementLogo(ctx, cx, cy, size) {
+  var r = size;
+  var dotR = size * 0.13;
+  var colors = ["#4a9c5c","#e0554a","#c9a040","#c9a870","#4a80b4"];
+  var angles = [-90, -18, 54, 126, 198];
+  var dots = [];
+  // 外圈
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(90,143,108,0.25)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // 计算点位
+  for (var i = 0; i < 5; i++) {
+    var rad = angles[i] * Math.PI / 180;
+    dots.push({ x: cx + Math.cos(rad) * (r - dotR - 2), y: cy + Math.sin(rad) * (r - dotR - 2), c: colors[i] });
+  }
+  // 连线
+  for (var i = 0; i < 5; i++) {
+    var n = (i + 1) % 5;
+    ctx.beginPath();
+    ctx.moveTo(dots[i].x, dots[i].y);
+    ctx.lineTo(dots[n].x, dots[n].y);
+    ctx.strokeStyle = "rgba(90,143,108,0.12)";
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+  // 圆点
+  for (var i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.arc(dots[i].x, dots[i].y, dotR, 0, Math.PI * 2);
+    ctx.fillStyle = dots[i].c;
+    ctx.fill();
+  }
+}
+
 function generatePoster() {
   if (!currentPillar) return;
   var canvas = posterCanvas;
@@ -1039,144 +1075,120 @@ function generatePoster() {
   var w = canvas.width;
   var h = canvas.height;
 
-  // 背景
-  var bg = ctx.createLinearGradient(0, 0, 0, h);
-  bg.addColorStop(0, "#f4f7f2");
-  bg.addColorStop(0.4, "#ffffff");
-  bg.addColorStop(1, "#f4f7f2");
-  ctx.fillStyle = bg;
+  // === 背景 ===
+  ctx.fillStyle = "#f8faf6";
   ctx.fillRect(0, 0, w, h);
 
-  // 顶部装饰（绿色散点）
-  ctx.fillStyle = "rgba(64,145,108,0.04)";
-  for (var i = 0; i < 80; i++) {
-    var dx = Math.random() * w;
-    var dy = Math.random() * h * 0.5;
-    ctx.beginPath();
-    ctx.arc(dx, dy, Math.random() * 3 + 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // === 顶部区域 ===
+  drawFiveElementLogo(ctx, w/2, 90, 44);
 
-  // 顶部五行图标
-  ctx.font = "36px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("🪵🔥⛰️⚔️💧", w / 2, 100);
-
-  // 标题
   ctx.fillStyle = "#2d6a4f";
-  ctx.font = "bold 36px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText("六十甲子日柱", w / 2, 168);
+  ctx.font = "bold 32px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("六十甲子日柱", w/2, 170);
 
-  // 分隔线
-  ctx.strokeStyle = "rgba(64,145,108,0.3)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(w / 2 - 100, 188);
-  ctx.lineTo(w / 2 + 100, 188);
-  ctx.stroke();
+  ctx.fillStyle = "#8d9f92";
+  ctx.font = "18px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("属于东方自己的MBTI人格", w/2, 200);
 
-  // 日柱大字
-  var elemColors = ["#6b8e4e","#6b8e4e","#d4533a","#d4533a","#c9a040","#c9a040","#a09068","#a09068","#4a80b4","#4a80b4"];
-  var nameColor = elemColors[currentStemIndex] || "#e8d5a3";
-  ctx.fillStyle = nameColor;
-  ctx.font = "bold 160px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText(currentPillar.name, w / 2, 370);
+  // === 日柱大字 ===
+  var elemColors = ["#40916c","#40916c","#e0554a","#e0554a","#c9a040","#c9a040","#c9a870","#c9a870","#4a80b4","#4a80b4"];
+  var color = elemColors[currentStemIndex] || "#2d6a4f";
+  ctx.fillStyle = color;
+  ctx.font = "bold 200px 'KaiTi','STKaiti','楷体','PingFang SC',sans-serif";
+  ctx.fillText(currentPillar.name, w/2, 370);
 
-  // 形象标签
-  var vibeY = 420;
+  // === 形象标签 ===
+  var y = 410;
   if (currentPillar.vibe) {
-    ctx.fillStyle = "rgba(64,145,108,0.1)";
-    ctx.strokeStyle = "rgba(64,145,108,0.3)";
-    ctx.lineWidth = 1;
-    var vibeW = ctx.measureText(currentPillar.vibe).width + 40;
-    roundRect(ctx, w/2 - vibeW/2, vibeY - 24, vibeW, 34, 17);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#2d6a4f";
-    ctx.font = "bold 22px 'PingFang SC','Microsoft YaHei',sans-serif";
-    ctx.fillText(currentPillar.vibe, w/2, vibeY);
-    vibeY += 50;
-  }
-
-  // 一句话
-  if (currentPillar.quote) {
-    ctx.fillStyle = "#5a7d65";
-    ctx.font = "italic 24px 'PingFang SC','Microsoft YaHei',sans-serif";
-    ctx.fillText("「" + currentPillar.quote + "」", w/2, vibeY);
-    vibeY += 48;
-  }
-
-  // 纳音标题
-  ctx.fillStyle = "#3d6b4f";
-  ctx.font = "24px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText(currentPillar.title, w / 2, vibeY);
-
-  // 序号 + 稀有度
-  ctx.fillStyle = "rgba(45,106,79,0.6)";
-  ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText("六十甲子 第" + (currentPillarIndex + 1) + "柱 · 每60天一次轮回", w / 2, 465);
-
-  // 五行标签
-  var elemTag = ELEMENTS[currentStemIndex] + " · " + YIN_YANG[currentStemIndex];
-  ctx.fillStyle = "#fff";
-  var elemBg = elemColors[currentStemIndex] || "#c9a96e";
-  var tagW = ctx.measureText("  " + elemTag + "  ").width;
-  var tagX = w / 2 - tagW / 2;
-  var tagY = 495;
-  ctx.fillStyle = elemBg;
-  roundRect(ctx, tagX, tagY - 28, tagW, 34, 17);
-  ctx.fill();
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 20px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText("  " + elemTag + "  ", w / 2, tagY - 2);
-
-  // 性格描述
-  var descText = currentPillar.desc;
-  if (descText.length > 140) descText = descText.substring(0, 140) + "…";
-  ctx.fillStyle = "#3a4d3e";
-  ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
-  wrapText(ctx, descText, w / 2, 570, w - 100, 34);
-
-  // 特质标签
-  var traits = currentPillar.traits;
-  var traitY = 730;
-  ctx.font = "20px 'PingFang SC','Microsoft YaHei',sans-serif";
-  for (var t = 0; t < traits.length; t++) {
-    var tw = ctx.measureText(traits[t]).width + 32;
-    var tx = 60 + (t % 3) * 220;
-    var trow = Math.floor(t / 3);
-    ctx.fillStyle = "rgba(64,145,108,0.1)";
+    ctx.font = "bold 28px 'PingFang SC','Microsoft YaHei',sans-serif";
+    var vw = ctx.measureText(currentPillar.vibe).width + 48;
+    ctx.fillStyle = "rgba(64,145,108,0.08)";
     ctx.strokeStyle = "rgba(64,145,108,0.25)";
     ctx.lineWidth = 1;
-    roundRect(ctx, tx, traitY + trow * 44 - 24, tw, 34, 17);
-    ctx.fill();
-    ctx.stroke();
+    roundRect(ctx, w/2 - vw/2, y-22, vw, 40, 20);
+    ctx.fill(); ctx.stroke();
     ctx.fillStyle = "#2d6a4f";
-    ctx.fillText(traits[t], tx + tw / 2, traitY + trow * 44 - 2);
+    ctx.fillText(currentPillar.vibe, w/2, y+6);
+    y += 56;
   }
 
-  // 分隔线
-  ctx.strokeStyle = "rgba(64,145,108,0.2)";
-  ctx.beginPath();
-  ctx.moveTo(w / 2 - 100, 920);
-  ctx.lineTo(w / 2 + 100, 920);
-  ctx.stroke();
+  // === 一句话 ===
+  if (currentPillar.quote) {
+    ctx.fillStyle = "#5a7d65";
+    ctx.font = "italic 28px 'PingFang SC','Microsoft YaHei',sans-serif";
+    ctx.fillText("「" + currentPillar.quote + "」", w/2, y);
+    y += 50;
+  }
 
-  // 底部信息
-  ctx.fillStyle = "rgba(58,77,62,0.5)";
-  ctx.font = "18px 'PingFang SC','Microsoft YaHei',sans-serif";
-  ctx.fillText("基于 滴天髓 · 子平真诠 · 穷通宝鉴 · 三命通会 · 渊海子平", w / 2, 970);
-  ctx.fillText("扫码测测你的日柱 → bazi-personality.pages.dev", w / 2, 1000);
+  // === 纳音 + 序号 ===
+  ctx.fillStyle = "#8d9f92";
+  ctx.font = "22px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText(currentPillar.title + "  ·  六十甲子第" + (currentPillarIndex+1) + "柱", w/2, y);
+  y += 36;
 
-  // 底部装饰线
+  // === 五行标签 ===
+  var elemTag = ELEMENTS[currentStemIndex] + " · " + YIN_YANG[currentStemIndex];
+  ctx.font = "bold 22px 'PingFang SC','Microsoft YaHei',sans-serif";
+  var etw = ctx.measureText(elemTag).width + 36;
+  ctx.fillStyle = elemColors[currentStemIndex];
+  roundRect(ctx, w/2 - etw/2, y-8, etw, 38, 19);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.fillText(elemTag, w/2, y+16);
+  y += 60;
+
+  // === 分隔 ===
   ctx.strokeStyle = "rgba(64,145,108,0.15)";
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(60, 1030);
-  ctx.lineTo(w - 60, 1030);
+  ctx.moveTo(60, y);
+  ctx.lineTo(w-60, y);
   ctx.stroke();
-  ctx.fillText("命理之说 · 仅供娱乐", w / 2, 1060);
+  y += 36;
 
-  // 显示弹窗
+  // === 性格标签（大方块 2行）===
+  var traits = currentPillar.traits;
+  var blockW = (w - 140) / 3;
+  ctx.font = "bold 24px 'PingFang SC','Microsoft YaHei',sans-serif";
+  var rowY = y;
+  for (var r = 0; r < 2; r++) {
+    for (var c = 0; c < 3; c++) {
+      var ti = r * 3 + c;
+      if (ti >= traits.length) break;
+      var bx = 60 + c * (blockW + 10);
+      var by = rowY + r * 60;
+      ctx.fillStyle = "rgba(64,145,108,0.06)";
+      ctx.strokeStyle = "rgba(64,145,108,0.2)";
+      ctx.lineWidth = 1;
+      roundRect(ctx, bx, by, blockW, 48, 14);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#2d6a4f";
+      ctx.fillText(traits[ti], bx + blockW/2, by + 32);
+    }
+  }
+  y += 140;
+
+  // === 分隔 ===
+  ctx.strokeStyle = "rgba(64,145,108,0.15)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, y);
+  ctx.lineTo(w-60, y);
+  ctx.stroke();
+  y += 32;
+
+  // === 底部 ===
+  ctx.fillStyle = "rgba(45,58,48,0.4)";
+  ctx.font = "18px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("基于 滴天髓 · 子平真诠 · 穷通宝鉴 · 三命通会 · 渊海子平", w/2, y);
+  y += 32;
+  ctx.fillText("bazi-personality.pages.dev", w/2, y);
+  y += 30;
+  ctx.fillStyle = "rgba(45,58,48,0.25)";
+  ctx.font = "16px 'PingFang SC','Microsoft YaHei',sans-serif";
+  ctx.fillText("命理之说 · 仅供娱乐", w/2, y);
+
   posterModal.classList.add("show");
 }
 
