@@ -227,17 +227,24 @@
     color: var(--text); font-family: inherit; outline: none; margin-top: 6px;
   }
   .bazi-chart {
-    background: var(--card-bg); border: 1px solid rgba(90,143,108,0.1);
-    border-radius: 12px; padding: 16px 10px; margin-top: 10px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.03);
+    background: var(--card-bg); border: 1px solid rgba(90,143,108,0.12);
+    border-radius: 14px; padding: 16px 8px; margin-top: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   }
-  .bazi-row { display: flex; justify-content: space-around; text-align: center; }
-  .bazi-col { flex: 1; }
-  .bazi-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; display: block; margin-bottom: 4px; }
-  .bazi-label-sm { font-size: 10px; color: rgba(45,58,48,0.4); display: block; margin-bottom: 2px; }
-  .bazi-pillar { font-size: 28px; font-weight: 900; color: var(--gold-light); letter-spacing: 2px; }
-  .bazi-stem { font-size: 20px; font-weight: 700; color: #40916c; }
-  .bazi-branch { font-size: 20px; font-weight: 700; color: #5a8fad; }
+  .bz-header, .bz-row {
+    display: flex; justify-content: space-around; text-align: center;
+  }
+  .bz-header span {
+    flex: 1; font-size: 11px; color: var(--text-dim); letter-spacing: 1px; padding: 4px 0;
+  }
+  .bz-header .bz-self { color: #b8753e; font-weight: 700; }
+  .bz-char {
+    flex: 1; font-size: 40px; font-weight: 900; padding: 8px 0;
+    font-family: "KaiTi","STKaiti","楷体","PingFang SC","Microsoft YaHei",serif;
+  }
+  .bz-self-char {
+    background: rgba(184,117,62,0.08); border-radius: 8px;
+  }
 
   /* 稀有度 */
   .rarity-badge {
@@ -370,25 +377,20 @@
       </select>
     </div>
     <div class="bazi-chart" id="baziChart">
-      <div class="bazi-row">
-        <div class="bazi-col"><span class="bazi-label">年柱</span><span class="bazi-pillar" id="yearPillar">--</span></div>
-        <div class="bazi-col"><span class="bazi-label">月柱</span><span class="bazi-pillar" id="monthPillar">--</span></div>
-        <div class="bazi-col"><span class="bazi-label">日柱</span><span class="bazi-pillar" id="dayPillar">--</span></div>
-        <div class="bazi-col"><span class="bazi-label">时柱</span><span class="bazi-pillar" id="hourPillar">--</span></div>
+      <div class="bz-header">
+        <span>年柱</span><span>月柱</span><span class="bz-self">日柱◎</span><span>时柱</span>
       </div>
-    </div>
-    <div class="bazi-chart" id="baziStemsChart" style="margin-top:6px;">
-      <div class="bazi-row">
-        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="yearStem">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="monthStem">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="dayStem">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">天干</span><span class="bazi-stem" id="hourStem">--</span></div>
+      <div class="bz-row">
+        <span class="bz-char" id="yearStem">--</span>
+        <span class="bz-char" id="monthStem">--</span>
+        <span class="bz-char bz-self-char" id="dayStem">--</span>
+        <span class="bz-char" id="hourStem">--</span>
       </div>
-      <div class="bazi-row">
-        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="yearBranch">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="monthBranch">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="dayBranch">--</span></div>
-        <div class="bazi-col"><span class="bazi-label-sm">地支</span><span class="bazi-branch" id="hourBranch">--</span></div>
+      <div class="bz-row">
+        <span class="bz-char" id="yearBranch">--</span>
+        <span class="bz-char" id="monthBranch">--</span>
+        <span class="bz-char bz-self-char" id="dayBranch">--</span>
+        <span class="bz-char" id="hourBranch">--</span>
       </div>
     </div>
   </div>
@@ -947,6 +949,23 @@ function calcHourPillar(dayStemIndex, hourBranchIndex) {
   return { stem: STEMS[si], branch: BRANCHES[hourBranchIndex], stemIndex: si, branchIndex: hourBranchIndex };
 }
 
+// 五行属色映射
+var WX_COLORS = {
+  "甲":"#4a9c5c","乙":"#52b788","寅":"#40916c","卯":"#52b788",   // 木-绿
+  "丙":"#e0554a","丁":"#e8736a","巳":"#d4533a","午":"#e0554a",   // 火-红
+  "戊":"#c9963a","己":"#d4a853","辰":"#c9a040","戌":"#c9963a","丑":"#b8953a","未":"#c9a040", // 土-黄褐
+  "庚":"#c9a870","辛":"#d4c090","申":"#c9a870","酉":"#d4c090",   // 金-金色
+  "壬":"#4a80b4","癸":"#5a90c4","亥":"#4a80b4","子":"#5a90c4"    // 水-蓝
+};
+
+/** 设置一个八字字符的颜色和文字 */
+function setBzChar(id, char) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = char;
+  el.style.color = WX_COLORS[char] || "#2d3a30";
+}
+
 /** 更新八字排盘 */
 function updateBaziChart() {
   var hb = parseInt(birthHour.value);
@@ -957,29 +976,22 @@ function updateBaziChart() {
   var yearPillar = calcYearPillar(year);
   var monthPillar = calcMonthPillar(yearPillar.stemIndex, month);
 
-  // 年柱
-  document.getElementById("yearPillar").textContent = yearPillar.stem + yearPillar.branch;
-  document.getElementById("yearStem").textContent = yearPillar.stem;
-  document.getElementById("yearBranch").textContent = yearPillar.branch;
-  // 月柱
-  document.getElementById("monthPillar").textContent = monthPillar.stem + monthPillar.branch;
-  document.getElementById("monthStem").textContent = monthPillar.stem;
-  document.getElementById("monthBranch").textContent = monthPillar.branch;
-  // 日柱
-  document.getElementById("dayPillar").textContent = dayPillar.stem + dayPillar.branch;
-  document.getElementById("dayStem").textContent = dayPillar.stem;
-  document.getElementById("dayBranch").textContent = dayPillar.branch;
+  setBzChar("yearStem", yearPillar.stem);
+  setBzChar("yearBranch", yearPillar.branch);
+  setBzChar("monthStem", monthPillar.stem);
+  setBzChar("monthBranch", monthPillar.branch);
+  setBzChar("dayStem", dayPillar.stem);
+  setBzChar("dayBranch", dayPillar.branch);
 
-  // 时柱
   if (hb >= 0) {
     var hourPillar = calcHourPillar(dayPillar.stemIndex, hb);
-    document.getElementById("hourPillar").textContent = hourPillar.stem + hourPillar.branch;
-    document.getElementById("hourStem").textContent = hourPillar.stem;
-    document.getElementById("hourBranch").textContent = hourPillar.branch;
+    setBzChar("hourStem", hourPillar.stem);
+    setBzChar("hourBranch", hourPillar.branch);
   } else {
-    document.getElementById("hourPillar").textContent = "??";
     document.getElementById("hourStem").textContent = "?";
     document.getElementById("hourBranch").textContent = "?";
+    document.getElementById("hourStem").style.color = "#ccc";
+    document.getElementById("hourBranch").style.color = "#ccc";
   }
 }
 
