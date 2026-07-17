@@ -188,6 +188,7 @@
     color: var(--gold-light);
   }
   .sub-card-body { font-size: 13px; line-height: 1.7; color: var(--text); margin: 0; }
+  .life-card { border-left: 3px solid #95d5b2; background: rgba(149,213,178,0.04); }
   .career-card { border-left: 3px solid #40916c; }
   .marriage-card { border-left: 3px solid #e07b5a; }
   .pros-card { border-left: 3px solid #52b788; }
@@ -335,6 +336,10 @@
   </div>
 
   <div class="sub-cards">
+    <div class="sub-card life-card">
+      <div class="sub-card-head">🌿 生活画像</div>
+      <p class="sub-card-body" id="lifeText"></p>
+    </div>
     <div class="sub-card career-card">
       <div class="sub-card-head">💼 事业方向</div>
       <p class="sub-card-body" id="careerText"></p>
@@ -795,7 +800,7 @@ birthInput.value = (function(d) {
 
 /** 将完整desc拆分为主文、事业、婚姻、优点、缺点 */
 function splitDesc(text) {
-  var result = { main: "", career: "", marriage: "", pros: "", cons: "" };
+  var result = { main: "", life: "", career: "", marriage: "", pros: "", cons: "" };
   if (!text) return result;
 
   var parts = text.split("【");
@@ -804,7 +809,8 @@ function splitDesc(text) {
 
   for (var i = 1; i < parts.length; i++) {
     var p = parts[i];
-    if (p.indexOf("事业】") === 0 || p.indexOf("事业方向】") === 0) result.career = p.replace(/^事业[^】]*】/, "").trim();
+    if (p.indexOf("生活】") === 0 || p.indexOf("生活画像】") === 0) result.life = p.replace(/^生活[^】]*】/, "").trim();
+    else if (p.indexOf("事业】") === 0 || p.indexOf("事业方向】") === 0) result.career = p.replace(/^事业[^】]*】/, "").trim();
     else if (p.indexOf("婚姻】") === 0 || p.indexOf("感情婚姻】") === 0) result.marriage = p.replace(/^婚姻[^】]*】/, "").replace(/^感情婚姻】/, "").trim();
     else if (p.indexOf("优点】") === 0 || p.indexOf("核心优点】") === 0) result.pros = p.replace(/^优点[^】]*】/, "").replace(/^核心优点】/, "").trim();
     else if (p.indexOf("缺点】") === 0 || p.indexOf("核心缺点】") === 0) result.cons = p.replace(/^缺点[^】]*】/, "").replace(/^核心缺点】/, "").trim();
@@ -846,6 +852,7 @@ function showResult() {
   // 提取各部分：主文（第一个【之前）、事业、婚姻、优点、缺点
   var sections = splitDesc(fullDesc);
   document.getElementById("personalityText").textContent = sections.main;
+  document.getElementById("lifeText").textContent = sections.life;
   document.getElementById("careerText").textContent = sections.career;
   document.getElementById("marriageText").textContent = sections.marriage;
   document.getElementById("prosText").textContent = sections.pros;
